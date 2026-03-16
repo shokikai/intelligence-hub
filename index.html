@@ -258,7 +258,7 @@ async function startFetch() {
  */
 async function fetchRSS(keyword, cat, max) {
   const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(keyword)}&hl=ja&gl=JP&ceid=JP:ja`;
-  const apiUrl = RSS2JSON + encodeURIComponent(rssUrl) + '&count=20';
+  const apiUrl = RSS2JSON + encodeURIComponent(rssUrl);
 
   const res = await fetch(apiUrl);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);

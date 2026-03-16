@@ -183,8 +183,8 @@ const KEYWORD_SOURCES = [
   { keyword: '海外 外食 成功',     cat: 6, max: 5 },
 ];
 
-// CORSプロキシ（Google News RSS はブラウザから直接取得できないため使用）
-const CORS_PROXY = 'https://corsproxy.io/?';
+// RSS→JSON変換API（CORS対応・無料・APIキー不要）
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
 // ===== STATE =====
 let activeTab = 0;
@@ -253,32 +253,37 @@ async function startFetch() {
 }
 
 /**
- * Google News RSS を CORS プロキシ経由で取得してパースする
+ * Google News RSS を rss2json.com 経由で取得してパースする
+ * rss2json はCORS対応のRSS→JSON変換APIで無料利用可能
  */
 async function fetchRSS(keyword, cat, max) {
   const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(keyword)}&hl=ja&gl=JP&ceid=JP:ja`;
-  const res = await fetch(CORS_PROXY + encodeURIComponent(rssUrl));
+  const apiUrl = RSS2JSON + encodeURIComponent(rssUrl) + '&count=20';
+
+  const res = await fetch(apiUrl);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const xml = await res.text();
+  const data = await res.json();
 
-  // DOMParser でXMLをパース
-  const doc = new DOMParser().parseFromString(xml, 'text/xml');
-  const items = Array.from(doc.querySelectorAll('item'));
+  if (data.status !== 'ok') throw new Error(`rss2json error: ${data.message}`);
 
-  return items.slice(0, max).map(item => {
-    const source = item.querySelector('source')?.textContent?.trim() || '';
-    const fullTitle = item.querySelector('title')?.textContent?.trim() || '';
-    // タイトル末尾の " - 出典名" を除去
+  return (data.items || []).slice(0, max).map(item => {
+    // rss2json は author に出典名が入ることがある。なければタイトルから抽出
+    const fullTitle = item.title || '';
+    const sourceFromTitle = fullTitle.match(/ - ([^-]+)$/) ;
+    const source = item.author || (sourceFromTitle ? sourceFromTitle[1].trim() : '');
     const title = source
       ? fullTitle.replace(new RegExp(` - ${escReg(source)}$`), '').trim()
       : fullTitle;
-    const link = item.querySelector('link')?.nextSibling?.nodeValue?.trim()
-               || item.querySelector('guid')?.textContent?.trim()
-               || '';
-    const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
 
-    return { cat, title, link, source, pubDate,
-             date: formatDate(pubDate), tag: keyword };
+    return {
+      cat,
+      title,
+      link: item.link || '',
+      source,
+      pubDate: item.pubDate || '',
+      date: formatDate(item.pubDate),
+      tag: keyword,
+    };
   }).filter(item => item.title.length > 0);
 }
 

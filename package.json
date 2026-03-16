@@ -1,0 +1,13 @@
+{
+  "name": "intelligence-hub",
+  "version": "1.0.0",
+  "description": "飲食業界情報ダッシュボード 自動更新スクリプト",
+  "type": "module",
+  "scripts": {
+    "fetch": "node fetch-news.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "fast-xml-parser": "^4.3.6"
+  }
+}

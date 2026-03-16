@@ -1,0 +1,57 @@
+name: 🍽️ Intelligence Hub - ニュース自動更新
+
+on:
+  # 毎日 9:00 JST（= 00:00 UTC）に自動実行
+  schedule:
+    - cron: '0 0 * * *'
+
+  # 手動でも実行できるようにする
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'デバッグログを有効にする'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  update-news:
+    name: ニュース取得・更新
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: write   # news-data.json をコミット・プッシュするために必要
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js 20 をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 依存パッケージをインストール
+        run: npm ci
+
+      - name: ニュースを取得・更新
+        run: node fetch-news.js
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: news-data.json をコミット＆プッシュ
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news-data.json
+          # 変更がある場合のみコミット
+          if git diff --staged --quiet; then
+            echo "ℹ️  news-data.json に変更なし。スキップします。"
+          else
+            DATE=$(TZ='Asia/Tokyo' date '+%Y-%m-%d %H:%M JST')
+            git commit -m "🤖 ニュース自動更新: ${DATE} [skip ci]"
+            git push
+            echo "✅ コミット＆プッシュ完了"
+          fi

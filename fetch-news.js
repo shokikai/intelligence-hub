@@ -21,10 +21,14 @@ const KEYWORDS = [
   'フードデリバリー',
   '飲食店 人手不足',
   '食品EC',
+  '外食産業',
+  '飲食店 DX',
+  '外食 新業態',
+  '食品 消費トレンド',
 ];
 
 /** 1キーワードあたり最大取得件数 */
-const MAX_PER_KEYWORD = 8;
+const MAX_PER_KEYWORD = 10;
 
 /** Claude バッチサイズ */
 const BATCH_SIZE = 10;

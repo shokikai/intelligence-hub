@@ -121,7 +121,7 @@ ${articleList}
 [
   {
     "index": 番号,
-    "relevant": true/false（飲食・食品・外食・フードに無関係ならfalse）,
+    "relevant": true/false（明らかに飲食・食品・外食・フード・消費・小売・労務・規制に無関係な場合のみfalse。迷ったらtrue）,
     "cat": 0〜6のいずれか,
     "title": "記事タイトル（日本語。英語なら自然な日本語に翻訳）",
     "summary": "2〜3文の日本語要約。事実を簡潔に。",
@@ -134,10 +134,11 @@ ${articleList}
   });
 
   const text = message.content[0].text;
+  console.log(`     Claude 生レスポンス（先頭300文字）: ${text.substring(0, 300)}`);
 
   // JSON配列を抽出（コードブロックで囲まれていることがあるため）
   const jsonMatch = text.match(/\[[\s\S]*\]/);
-  if (!jsonMatch) throw new Error(`Claude から JSON が返されませんでした: ${text.substring(0, 200)}`);
+  if (!jsonMatch) throw new Error(`Claude から JSON が返されませんでした: ${text.substring(0, 300)}`);
   return JSON.parse(jsonMatch[0]);
 }
 
@@ -155,7 +156,9 @@ async function main() {
     try {
       console.log(`  📡 RSS 取得: "${keyword}"`);
       const xml = await fetchRSS(keyword);
+      console.log(`     RSS XML 先頭100文字: ${xml.substring(0, 100)}`);
       const items = parseRSS(xml);
+      console.log(`     パース結果: ${items.length} 件`);
       let added = 0;
 
       for (const item of items.slice(0, MAX_PER_KEYWORD)) {
@@ -194,6 +197,9 @@ async function main() {
 
     try {
       const processed = await processWithClaude(batch);
+
+      const relevantCount = processed.filter(p => p.relevant).length;
+      console.log(`     relevant:true = ${relevantCount}件 / ${processed.length}件`);
 
       for (const p of processed) {
         if (!p.relevant) continue;

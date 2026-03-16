@@ -24,11 +24,12 @@
   .header { background: linear-gradient(135deg, var(--primary) 0%, #2a5298 100%); color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
   .header-left h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
   .header-left p { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-  .header-right { text-align: right; }
+  .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
   .date-display { font-size: 13px; opacity: 0.9; }
   .date-display strong { font-size: 18px; display: block; margin-top: 2px; }
-  .update-status { font-size: 11px; opacity: 0.75; margin-top: 4px; }
-  .update-status.sample { color: #ffd580; }
+  .refresh-btn { padding: 5px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; color: white; font-size: 12px; cursor: pointer; transition: background 0.2s; }
+  .refresh-btn:hover { background: rgba(255,255,255,0.25); }
+  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ===== CONTAINER ===== */
   .container { max-width: 1400px; margin: 0 auto; padding: 20px 16px; }
@@ -37,18 +38,20 @@
   .loading-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 16px; color: var(--text-light); }
   .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent2); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .progress-text { font-size: 13px; color: var(--text-light); }
 
   /* ===== SPOTLIGHT ===== */
   .spotlight { background: var(--card); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; box-shadow: var(--shadow); border-left: 4px solid var(--accent); }
   .spotlight-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
   .spotlight-header h2 { font-size: 16px; font-weight: 700; color: var(--primary); }
   .spotlight-badge { background: var(--accent); color: white; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
-  .spotlight-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-  .spotlight-item { background: var(--bg); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+  .spotlight-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .spotlight-item { background: var(--bg); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--border); transition: all 0.2s; }
   .spotlight-item:hover { border-color: var(--accent2); box-shadow: var(--shadow-hover); transform: translateY(-1px); }
-  .spotlight-item .cat { font-size: 11px; color: var(--text-light); margin-bottom: 4px; }
-  .spotlight-item .title { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--text); }
-  .spotlight-item .insight { font-size: 12px; color: var(--accent); margin-top: 6px; font-weight: 500; }
+  .spotlight-item .s-cat { font-size: 11px; color: var(--text-light); margin-bottom: 4px; }
+  .spotlight-item .s-title a { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--text); text-decoration: none; }
+  .spotlight-item .s-title a:hover { color: var(--accent2); text-decoration: underline; }
+  .spotlight-item .s-meta { font-size: 11px; color: var(--text-light); margin-top: 5px; }
 
   /* ===== TABS ===== */
   .tabs-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; margin-bottom: 16px; }
@@ -64,33 +67,32 @@
   /* ===== TAB CONTENT ===== */
   .tab-content { display: none; }
   .tab-content.active { display: block; }
-  .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
   .empty-cat { text-align: center; padding: 40px 20px; color: var(--text-light); font-size: 13px; }
 
   /* ===== NEWS CARD ===== */
-  .news-card { background: var(--card); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: all 0.2s; }
+  .news-card { background: var(--card); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: all 0.2s; }
   .news-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
   .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 4px; }
-  .card-tag { font-size: 11px; background: #eef2f7; color: var(--text-light); padding: 2px 8px; border-radius: 4px; font-weight: 500; }
-  .card-tag.hot { background: #fff3ef; color: var(--accent); }
-  .card-date { font-size: 11px; color: var(--text-light); }
-  .card-source-link { font-size: 11px; color: var(--accent2); text-decoration: none; border-bottom: 1px dashed var(--accent2); transition: color 0.2s; }
+  .card-source { font-size: 11px; }
+  .card-source-link { color: var(--accent2); text-decoration: none; border-bottom: 1px dashed var(--accent2); }
   .card-source-link:hover { color: #1a6080; border-bottom-style: solid; }
-  .card-source-text { font-size: 11px; color: var(--text-light); }
-  .card-title { font-size: 15px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; color: var(--text); }
-  .card-summary { font-size: 13px; color: var(--text-light); line-height: 1.6; margin-bottom: 12px; }
-  .insight-box { background: linear-gradient(135deg, #fff8f0 0%, #fff3e8 100%); border-radius: 8px; padding: 10px 12px; border-left: 3px solid var(--accent); }
-  .insight-box .insight-label { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-  .insight-box .insight-text { font-size: 13px; color: #7a3a1a; line-height: 1.5; }
-  .card-actions { display: flex; gap: 8px; margin-top: 12px; }
-  .btn-memo { padding: 5px 12px; font-size: 12px; border: 1px solid var(--border); background: var(--card); border-radius: 6px; cursor: pointer; color: var(--text-light); transition: all 0.2s; }
+  .card-date { font-size: 11px; color: var(--text-light); }
+  .card-title { font-size: 14px; font-weight: 700; line-height: 1.5; margin-bottom: 10px; }
+  .card-title a { color: var(--text); text-decoration: none; }
+  .card-title a:hover { color: var(--accent2); text-decoration: underline; }
+  .card-actions { display: flex; gap: 8px; }
+  .btn-memo { padding: 4px 10px; font-size: 12px; border: 1px solid var(--border); background: var(--card); border-radius: 6px; cursor: pointer; color: var(--text-light); transition: all 0.2s; }
   .btn-memo:hover { border-color: var(--accent2); color: var(--accent2); }
   .memo-input-area { display: none; margin-top: 10px; }
   .memo-input-area textarea { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 13px; resize: vertical; min-height: 60px; font-family: inherit; }
   .memo-input-area textarea:focus { outline: none; border-color: var(--accent2); }
   .memo-save-btn { margin-top: 6px; padding: 5px 14px; background: var(--accent2); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
-  .memo-display { margin-top: 10px; background: #f0f8ff; border-radius: 6px; padding: 8px 10px; font-size: 12px; color: #2a6496; border: 1px solid #c8e6f8; }
+  .memo-display { margin-top: 8px; background: #f0f8ff; border-radius: 6px; padding: 8px 10px; font-size: 12px; color: #2a6496; border: 1px solid #c8e6f8; }
   .memo-display .memo-label { font-weight: 700; margin-bottom: 2px; font-size: 11px; }
+
+  /* ===== ERROR NOTICE ===== */
+  .fetch-error { background: #fff8f0; border: 1px solid #ffd6b0; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #a05010; margin-bottom: 14px; }
 
   /* ===== FOOTER ===== */
   .footer { text-align: center; padding: 20px; color: var(--text-light); font-size: 12px; }
@@ -110,7 +112,6 @@
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-left">
     <h1>🏢 Intelligence Hub</h1>
@@ -121,43 +122,38 @@
       本日の情報収集
       <strong id="currentDate">—</strong>
     </div>
-    <div class="update-status" id="updateStatus">読み込み中...</div>
+    <button class="refresh-btn" id="refreshBtn" onclick="startFetch()">🔄 更新</button>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- ローディング表示 -->
   <div class="loading-overlay" id="loadingArea">
     <div class="spinner"></div>
-    <div>ニュースデータを読み込み中...</div>
+    <div class="progress-text" id="progressText">ニュースを取得中...</div>
   </div>
 
-  <!-- メインコンテンツ（読み込み後に表示） -->
   <div id="mainContent" style="display:none">
 
-    <!-- SPOTLIGHT -->
     <div class="spotlight">
       <div class="spotlight-header">
-        <h2>⭐ 今日の注目トピック</h2>
-        <span class="spotlight-badge">TOP 5</span>
+        <h2>⭐ 最新トピック</h2>
+        <span class="spotlight-badge" id="spotlightBadge">TOP 5</span>
       </div>
       <div class="spotlight-grid" id="spotlightGrid"></div>
     </div>
 
-    <!-- TABS -->
     <div class="tabs-wrapper">
       <div class="tabs" id="tabBar"></div>
     </div>
 
-    <!-- TAB CONTENTS -->
     <div id="tabContents"></div>
 
   </div>
 
 </div>
 
-<div class="footer">Intelligence Hub — ニュースは毎朝9時に自動更新 | メモはローカルストレージに保存</div>
+<div class="footer">Intelligence Hub — Google News RSS リアルタイム取得 | メモはローカルストレージに保存</div>
 
 <script>
 // ===== カテゴリ定義 =====
@@ -171,76 +167,79 @@ const CATEGORIES = [
   { id: 6, icon: '🌍', name: '海外成功事例' },
 ];
 
-// ===== サンプルデータ（news-data.json 未生成時のフォールバック） =====
-const SAMPLE_NEWS = [
-  {
-    cat: 0, hot: true,
-    title: '大手居酒屋チェーンが関東圏20店舗を閉鎖・業態転換へ',
-    summary: '大手居酒屋チェーンA社が2025年度末までに関東圏の既存店20店舗を閉鎖し、ファミリー向け和食ダイニングへの業態転換を発表。アルコール需要の回復が鈍く、昼帯の強化を図る。',
-    insight: '居酒屋業態の構造的苦境が続く。自社の酒類比率・時間帯別売上を再確認し、ランチ・テイクアウト強化による収益多様化を加速させる機会。',
-    source: '日経MJ', url: 'https://www.nikkei.com/theme/?dw=221221', date: '2026-03-16', tag: '要注目',
-  },
-  {
-    cat: 1, hot: true,
-    title: 'AIによる動的メニュープライシング、大手チェーンが本格導入',
-    summary: '大手ファミレスチェーンがAIを活用した時間帯・曜日別の動的価格設定を全店導入すると発表。ランチ・ピーク時と閑散時で最大15%の価格差をつけることで、客数平準化と利益率改善を目指す。',
-    insight: '動的プライシングは収益最大化に有効だが、顧客の値頃感・ブランドへの影響も大きい。自社での試験導入（特定時間帯・特定メニューのみ）から検証を始める価値あり。',
-    source: '日経ビジネス', url: 'https://business.nikkei.com/', date: '2026-03-16', tag: 'AI',
-  },
-  {
-    cat: 2, hot: true,
-    title: 'Instagram「ショッピング機能」を活用した食品D2C売上が前年比2.3倍',
-    summary: 'Instagram経由の食品・飲料D2C売上が2025年通期で前年比2.3倍に拡大。ブランドストーリーを丁寧に発信する中小食品ブランドのROASが高く、大手ECサイト依存からの脱却が進んでいる。',
-    insight: '自社ECの集客源としてInstagramの比重を高める好機。ショッピング機能設定状況・コンテンツ戦略を見直し、店舗限定商品のEC展開も検討したい。',
-    source: 'MarkeZine', url: 'https://markezine.jp/', date: '2026-03-15', tag: 'SNS',
-  },
-  {
-    cat: 3, hot: true,
-    title: '20〜30代の「外食節約意識」が過去最高水準、「特別体験」への支出は増加',
-    summary: '博報堂の消費意識調査で、20〜30代の日常外食への節約意識が過去10年で最高水準を記録。一方で誕生日・記念日などのハレの日外食への支出意欲は高い。',
-    insight: '日常価格帯の競争激化に備え、ランチのコスパ訴求を強化しつつ、記念日プランや特別コースの充実で二層戦略を展開することが有効。',
-    source: '博報堂生活総研', url: 'https://seikatsusoken.jp/', date: '2026-03-16', tag: '要注目',
-  },
-  {
-    cat: 4,
-    title: '飲食業アルバイト時給、全国平均が初めて1,200円を突破',
-    summary: '2026年2月の飲食業アルバイト時給が全国平均で初めて1,200円を突破（前年比+8%）。都市部では1,400円台の求人も増加しており、人件費圧力が一層強まっている。',
-    insight: '時給上昇は当面続く見通し。セルフオーダー・配膳ロボットなどの省人化投資のROIが改善しており、設備投資の前倒し検討が急務。',
-    source: 'インディード労働市場研究所', url: 'https://www.indeedlab.jp/', date: '2026-03-15', tag: '人件費',
-  },
-  {
-    cat: 5,
-    title: '食品表示法改正：アレルゲン表示義務の拡大が2027年4月施行へ',
-    summary: '消費者庁がくるみ・マカダミアナッツを表示義務化へ格上げ。外食店のメニュー表示・厨房管理の見直しが2027年4月までに必要。',
-    insight: '全70店舗のメニュー・原材料データベースの整備が急務。2026年中に対応完了スケジュールを策定する。',
-    source: '消費者庁', url: 'https://www.caa.go.jp/policies/policy/food_labeling/', date: '2026-03-14', tag: '法改正',
-  },
-  {
-    cat: 6, hot: true,
-    title: '【米国】ファストカジュアル業態が高級レストランの客数を初めて逆転',
-    summary: '米国外食産業調査で、ファストカジュアル（チポトレ等）の来客数がファインダイニングを初めて上回った。高品質・適正価格・スピードを両立した業態が物価高の中で支持を拡大している。',
-    insight: '日本でも同様の流れが起きつつある。ファストカジュアル要素を取り込んだ新業態・メニューラインを検討する価値あり。',
-    source: 'Technomic Inc.', url: 'https://www.technomic.com/', date: '2026-03-16', tag: '米国',
-  },
+// ===== キーワード → カテゴリ マッピング =====
+const KEYWORD_SOURCES = [
+  { keyword: '飲食業界',           cat: 0, max: 8 },
+  { keyword: '外食産業',           cat: 0, max: 6 },
+  { keyword: '外食 新業態',        cat: 0, max: 5 },
+  { keyword: 'フードテック',       cat: 1, max: 8 },
+  { keyword: 'フードデリバリー',   cat: 1, max: 6 },
+  { keyword: '飲食店 DX',          cat: 1, max: 5 },
+  { keyword: '食品EC',             cat: 2, max: 8 },
+  { keyword: '外食トレンド',       cat: 3, max: 6 },
+  { keyword: '食品 消費トレンド',  cat: 3, max: 5 },
+  { keyword: '飲食店 人手不足',    cat: 4, max: 8 },
+  { keyword: '飲食業 補助金',      cat: 5, max: 5 },
+  { keyword: '海外 外食 成功',     cat: 6, max: 5 },
 ];
+
+// CORSプロキシ（Google News RSS はブラウザから直接取得できないため使用）
+const CORS_PROXY = 'https://corsproxy.io/?';
 
 // ===== STATE =====
 let activeTab = 0;
 let NEWS_DATA = [];
 
 // ===== INIT =====
-async function init() {
-  // 今日の日付を表示
+function init() {
   const today = new Date();
   const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
   document.getElementById('currentDate').textContent = today.toLocaleDateString('ja-JP', opts);
 
-  // LocalStorage からメモを読み込み
   const savedMemos = localStorage.getItem('ih_memos');
   window._memos = savedMemos ? JSON.parse(savedMemos) : {};
 
-  // ニュースデータを読み込んでレンダリング
-  NEWS_DATA = await loadNewsData();
+  startFetch();
+}
+
+// ===== RSS 取得 =====
+async function startFetch() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = '取得中...';
+
+  document.getElementById('loadingArea').style.display = 'flex';
+  document.getElementById('mainContent').style.display = 'none';
+  document.getElementById('tabContents').innerHTML = '';
+
+  const progress = document.getElementById('progressText');
+  NEWS_DATA = [];
+  const seenTitles = new Set();
+  let done = 0;
+
+  // 全キーワードを並列取得
+  const results = await Promise.allSettled(
+    KEYWORD_SOURCES.map(src => fetchRSS(src.keyword, src.cat, src.max))
+  );
+
+  for (const result of results) {
+    done++;
+    progress.textContent = `取得中... ${done} / ${KEYWORD_SOURCES.length} キーワード完了`;
+
+    if (result.status === 'fulfilled') {
+      for (const item of result.value) {
+        // タイトル先頭25文字で重複除去
+        const key = item.title.replace(/\s+/g, '').substring(0, 25);
+        if (!seenTitles.has(key)) {
+          seenTitles.add(key);
+          NEWS_DATA.push(item);
+        }
+      }
+    }
+  }
+
+  // 日付の新しい順に並べ替え
+  NEWS_DATA.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
   document.getElementById('loadingArea').style.display = 'none';
   document.getElementById('mainContent').style.display = 'block';
@@ -248,31 +247,39 @@ async function init() {
   renderTabs();
   renderSpotlight();
   renderTabContent(0);
+
+  btn.disabled = false;
+  btn.textContent = '🔄 更新';
 }
 
-// ===== news-data.json 読み込み =====
-async function loadNewsData() {
-  const statusEl = document.getElementById('updateStatus');
-  try {
-    const res = await fetch('news-data.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+/**
+ * Google News RSS を CORS プロキシ経由で取得してパースする
+ */
+async function fetchRSS(keyword, cat, max) {
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(keyword)}&hl=ja&gl=JP&ceid=JP:ja`;
+  const res = await fetch(CORS_PROXY + encodeURIComponent(rssUrl));
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const xml = await res.text();
 
-    if (statusEl) {
-      statusEl.textContent = `最終更新: ${data.updateDate || data.lastUpdated || '不明'}`;
-      statusEl.classList.remove('sample');
-    }
-    // news 配列が空でもサンプルへフォールバック
-    return Array.isArray(data.news) && data.news.length > 0 ? data.news : SAMPLE_NEWS;
+  // DOMParser でXMLをパース
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const items = Array.from(doc.querySelectorAll('item'));
 
-  } catch {
-    // JSON が存在しない or GitHub Pages 未設定 → サンプルデータを表示
-    if (statusEl) {
-      statusEl.textContent = 'サンプルデータ表示中（初回またはオフライン）';
-      statusEl.classList.add('sample');
-    }
-    return SAMPLE_NEWS;
-  }
+  return items.slice(0, max).map(item => {
+    const source = item.querySelector('source')?.textContent?.trim() || '';
+    const fullTitle = item.querySelector('title')?.textContent?.trim() || '';
+    // タイトル末尾の " - 出典名" を除去
+    const title = source
+      ? fullTitle.replace(new RegExp(` - ${escReg(source)}$`), '').trim()
+      : fullTitle;
+    const link = item.querySelector('link')?.nextSibling?.nodeValue?.trim()
+               || item.querySelector('guid')?.textContent?.trim()
+               || '';
+    const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
+
+    return { cat, title, link, source, pubDate,
+             date: formatDate(pubDate), tag: keyword };
+  }).filter(item => item.title.length > 0);
 }
 
 // ===== TABS =====
@@ -297,17 +304,19 @@ function switchTab(idx) {
 
 // ===== SPOTLIGHT =====
 function renderSpotlight() {
-  const hotItems = NEWS_DATA.filter(n => n.hot).slice(0, 5);
+  // 全カテゴリから最新5件を表示
+  const top = NEWS_DATA.slice(0, 5);
   const grid = document.getElementById('spotlightGrid');
-  if (hotItems.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-light);font-size:13px">注目ニュースはありません</p>';
+  if (top.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-light);font-size:13px">取得できませんでした</p>';
     return;
   }
-  grid.innerHTML = hotItems.map(n => `
-    <div class="spotlight-item" onclick="switchTab(${n.cat})">
-      <div class="cat">${CATEGORIES[n.cat]?.icon ?? ''} ${CATEGORIES[n.cat]?.name ?? ''}</div>
-      <div class="title">${escHtml(n.title)}</div>
-      <div class="insight">→ ${escHtml(n.insight.split('。')[0])}。</div>
+  document.getElementById('spotlightBadge').textContent = `TOP ${top.length}`;
+  grid.innerHTML = top.map(n => `
+    <div class="spotlight-item">
+      <div class="s-cat">${CATEGORIES[n.cat]?.icon ?? ''} ${CATEGORIES[n.cat]?.name ?? ''}</div>
+      <div class="s-title"><a href="${escHtml(n.link)}" target="_blank" rel="noopener noreferrer">${escHtml(n.title)}</a></div>
+      <div class="s-meta">${escHtml(n.source)} · ${escHtml(n.date)}</div>
     </div>
   `).join('');
 }
@@ -334,25 +343,18 @@ function renderCard(n, i, catIdx) {
   const cardId = `card-${catIdx}-${i}`;
   const memo = window._memos[cardId] || '';
 
-  // 出典表示（URL があればリンク化）
-  let sourceHtml = '';
-  if (n.source) {
-    sourceHtml = n.url
-      ? ` / <a class="card-source-link" href="${escHtml(n.url)}" target="_blank" rel="noopener noreferrer">${escHtml(n.source)} ↗</a>`
-      : ` / <span class="card-source-text">${escHtml(n.source)}</span>`;
-  }
+  const sourceHtml = n.source
+    ? `<span class="card-source"><a class="card-source-link" href="https://news.google.com/search?q=${encodeURIComponent(n.source)}&hl=ja" target="_blank" rel="noopener noreferrer">${escHtml(n.source)}</a></span>`
+    : '';
 
   return `
     <div class="news-card" id="${cardId}">
       <div class="card-meta">
-        <span class="card-tag ${n.hot ? 'hot' : ''}">${escHtml(n.tag || '')}</span>
-        <span class="card-date">${escHtml(n.date || '')}${sourceHtml}</span>
+        ${sourceHtml}
+        <span class="card-date">${escHtml(n.date)}</span>
       </div>
-      <div class="card-title">${escHtml(n.title)}</div>
-      <div class="card-summary">${escHtml(n.summary)}</div>
-      <div class="insight-box">
-        <div class="insight-label">💡 自社への示唆</div>
-        <div class="insight-text">${escHtml(n.insight)}</div>
+      <div class="card-title">
+        <a href="${escHtml(n.link)}" target="_blank" rel="noopener noreferrer">${escHtml(n.title)}</a>
       </div>
       ${memo ? `<div class="memo-display"><div class="memo-label">📝 メモ</div>${escHtml(memo)}</div>` : ''}
       <div class="card-actions">
@@ -360,7 +362,7 @@ function renderCard(n, i, catIdx) {
       </div>
       <div class="memo-input-area" id="memoArea-${cardId}">
         <textarea id="memoText-${cardId}" placeholder="メモを入力...">${escHtml(memo)}</textarea>
-        <button class="memo-save-btn" onclick="saveMemo('${cardId}')">保存</button>
+        <button class="memo-save-btn" onclick="saveMemo('${cardId}', ${catIdx})">保存</button>
       </div>
     </div>`;
 }
@@ -371,28 +373,36 @@ function toggleMemo(cardId) {
   area.style.display = area.style.display === 'block' ? 'none' : 'block';
 }
 
-function saveMemo(cardId) {
+function saveMemo(cardId, catIdx) {
   const text = document.getElementById(`memoText-${cardId}`).value;
   window._memos[cardId] = text;
   localStorage.setItem('ih_memos', JSON.stringify(window._memos));
-  rerenderCurrentTab();
-}
-
-function rerenderCurrentTab() {
-  const el = document.getElementById(`tabContent${activeTab}`);
+  // 該当タブだけ再描画
+  const el = document.getElementById(`tabContent${catIdx}`);
   if (el) el.remove();
-  renderTabContent(activeTab);
-  switchTab(activeTab);
+  renderTabContent(catIdx);
+  switchTab(catIdx);
 }
 
 // ===== UTIL =====
 function escHtml(str) {
   return String(str ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+// 正規表現のエスケープ
+function escReg(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// pubDate → "YYYY-MM-DD" 形式
+function formatDate(pubDate) {
+  if (!pubDate) return '';
+  try {
+    const d = new Date(pubDate);
+    return d.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  } catch { return pubDate; }
 }
 
 // ===== START =====
